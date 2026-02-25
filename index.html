@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ random beauty · flowing canvas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0b0c1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      padding: 1rem;
+    }
+
+    /* main card – softly lit glass container */
+    .dreamscape {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(20, 15, 40, 0.28);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border-radius: 3.5rem 1.5rem 3.5rem 1.5rem;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                  0 0 0 2px rgba(160, 120, 255, 0.15);
+      padding: 2.8rem 2rem;
+      transition: border-radius 0.3s ease;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    /* floating orbs (animated background canvas) */
+    #beautyCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;  /* so UI stays clickable */
+    }
+
+    /* all content sits above canvas */
+    .content {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.2rem;
+      color: white;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* elegant random title */
+    .random-title {
+      font-size: clamp(2.2rem, 10vw, 4.8rem);
+      font-weight: 400;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffe6b0, #c1b3ff, #a6dcff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.1;
+      text-align: center;
+      filter: drop-shadow(0 8px 6px #00000055);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+      padding-bottom: 0.5rem;
+      mix-blend-mode: hard-light;
+    }
+
+    .random-title span {
+      font-size: 0.45em;
+      display: block;
+      letter-spacing: 8px;
+      font-weight: 300;
+      color: #ffefc0;
+      text-shadow: 0 0 15px hotpink;
+    }
+
+    /* three random cards */
+    .card-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.8rem;
+      margin: 0.8rem 0 1rem;
+    }
+
+    .card {
+      background: rgba(8, 5, 16, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 215, 255, 0.25);
+      border-radius: 2rem 0.8rem 2rem 0.8rem;
+      padding: 2rem 1.8rem;
+      min-width: 200px;
+      flex: 1 1 180px;
+      box-shadow: 0 20px 40px -15px black;
+      transition: all 0.25s;
+      color: #f5edff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      background: rgba(25, 15, 35, 0.65);
+      border-color: rgba(255, 200, 255, 0.7);
+      box-shadow: 0 0 30px #ca9eff66;
+    }
+
+    .card-emoji {
+      font-size: 4rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px currentColor);
+      margin-bottom: 0.5rem;
+    }
+
+    .card h3 {
+      font-weight: 300;
+      font-size: 1.7rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      background: linear-gradient(145deg, #fff2b5, #d6bcff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .card p {
+      font-size: 1rem;
+      margin-top: 0.6rem;
+      opacity: 0.8;
+      font-weight: 200;
+      line-height: 1.5;
+    }
+
+    /* main action button – changes vibe randomly */
+    .randomize-btn {
+      background: rgba(10, 8, 20, 0.6);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(255, 166, 245, 0.6);
+      border-radius: 60px;
+      padding: 1rem 3rem;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: white;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 30px #b77eff, inset 0 0 10px #ffffff30;
+      transition: 0.2s;
+      margin-top: 1.2rem;
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .randomize-btn:hover {
+      background: rgba(60, 20, 70, 0.8);
+      border-color: #ffdc9a;
+      box-shadow: 0 0 45px #f0a0ff, inset 0 0 20px #fff9;
+      transform: scale(1.03);
+      letter-spacing: 5px;
+    }
+
+    .btn-emoji {
+      font-size: 2rem;
+      filter: drop-shadow(0 0 5px gold);
+    }
+
+    /* bottom whisper */
+    .random-footnote {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      font-weight: 200;
+      font-style: italic;
+      text-align: center;
+      background: rgba(0,0,0,0.2);
+      padding: 0.5rem 1.8rem;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,240,0.2);
+    }
+
+    /* responsive adjustments */
+    @media (max-width: 550px) {
+      .dreamscape { padding: 2rem 1.2rem; }
+      .card { min-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- canvas for fluid random background (floating particles) -->
+  <canvas id="beautyCanvas"></canvas>
+
+  <main class="dreamscape">
+    <div class="content">
+      <!-- title + dynamic word -->
+      <div class="random-title" id="randomTitle">
+        ✦ ephemeral ✦
+        <span id="dynamicWord">serendipity</span>
+      </div>
+
+      <!-- three cards, each with random flavor (updated via js) -->
+      <div class="card-gallery">
+        <div class="card" id="card1">
+          <div class="card-emoji" id="emoji1">✨</div>
+          <h3 id="cardTitle1">cosmic</h3>
+          <p id="cardDesc1">stardust & whispers</p>
+        </div>
+        <div class="card" id="card2">
+          <div class="card-emoji" id="emoji2">🌿</div>
+          <h3 id="cardTitle2">dream</h3>
+          <p id="cardDesc2">floating narratives</p>
+        </div>
+        <div class="card" id="card3">
+          <div class="card-emoji" id="emoji3">🌀</div>
+          <h3 id="cardTitle3">mirage</h3>
+          <p id="cardDesc3">soft echoes</p>
+        </div>
+      </div>
+
+      <!-- randomize button – refreshes content & background -->
+      <button class="randomize-btn" id="randomizeBtn">
+        <span class="btn-emoji">🎲</span> randomize
+        <span class="btn-emoji">🌙</span>
+      </button>
+
+      <div class="random-footnote" id="footnote">
+        « every click is a new beautiful universe »
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      // ---------- canvas setup (floating orbs / gradient particles) ----------
+      const canvas = document.getElementById('beautyCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+
+      const PARTICLE_COUNT = 85;
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random(),
+            y: Math.random(),
+            radius: 4 + Math.random() * 28,        // diverse sizes
+            speedX: (Math.random() - 0.5) * 0.002,
+            speedY: (Math.random() - 0.5) * 0.002,
+            baseColor: `hsl(${Math.random() * 360}, 70%, 70%)`,
+            blur: 12 + Math.random() * 30,          // for soft glow
+          });
+        }
+      }
+      initParticles();
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // color themes for background – randomly picked each click
+      let currentBackgroundStyle = {
+        gradientTop: '#0f1123',
+        gradientBottom: '#261e35',
+        glowColor1: '#ab8cff',
+        glowColor2: '#ffb3c6'
+      };
+
+      function updateBackgroundTheme() {
+        // random pastel / dreamy gradient stops
+        const hue1 = Math.floor(Math.random() * 360);
+        const hue2 = (hue1 + 30 + Math.random() * 60) % 360;
+        const hue3 = (hue2 + 40) % 360;
+
+        currentBackgroundStyle = {
+          gradientTop: `hsl(${hue1}, 70%, 12%)`,
+          gradientBottom: `hsl(${hue2}, 75%, 18%)`,
+          glowColor1: `hsl(${hue3}, 85%, 70%)`,
+          glowColor2: `hsl(${(hue1 + 120) % 360}, 80%, 75%)`,
+        };
+
+        // also repaint particles with fresher colors? we reassign new baseColors gradually
+        for (let p of particles) {
+          // shift hue randomly a bit to match new vibe (or keep mix)
+          if (Math.random() > 0.3) {
+            let newH = (parseInt(p.baseColor.split(',')[0].split('(')[1]) + 20 + Math.random() * 100) % 360;
+            p.baseColor = `hsl(${newH}, 70%, 70%)`;
+          }
+        }
+      }
+
+      // animation loop – paints soft particles & gradient
+      function drawBackground() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+
+        // large gradient background
+        const gradient = ctx.createLinearGradient(0, 0, width * 0.8, height);
+        gradient.addColorStop(0, currentBackgroundStyle.gradientTop);
+        gradient.addColorStop(0.5, '#1d1930');
+        gradient.addColorStop(1, currentBackgroundStyle.gradientBottom);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // draw floating soft circles (particles)
+        for (let p of particles) {
+          // update positions gently
+          p.x += p.speedX;
+          p.y += p.speedY;
+
+          // wrap around edges with padding
+          if (p.x < -0.1) p.x = 1.1;
+          if (p.x > 1.1) p.x = -0.1;
+          if (p.y < -0.1) p.y = 1.1;
+          if (p.y > 1.1) p.y = -0.1;
+
+          const xPos = p.x * width;
+          const yPos = p.y * height;
+          const radius = p.radius * (0.7 + 0.4 * Math.sin(Date.now() * 0.001 + p.x * 10)); // subtle pulse
+
+          // create radial gradient for each particle (glow)
+          const grd = ctx.createRadialGradient(xPos - 5, yPos - 5, 2, xPos, yPos, radius * 1.8);
+          grd.addColorStop(0, p.baseColor);
+          grd.addColorStop(0.6, 'rgba(180, 140, 255, 0.25)');
+          grd.addColorStop(1, 'rgba(0,0,0,0)');
+
+          ctx.beginPath();
+          ctx.arc(xPos, yPos, radius * 1.2, 0, Math.PI * 2);
+          ctx.fillStyle = grd;
+          ctx.fill();
+
+          // extra tiny bright core
+          ctx.beginPath();
+          ctx.arc(xPos-2, yPos-2, radius * 0.25, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.fill();
+        }
+
+        // add some hazy light streaks (extra random)
+        ctx.fillStyle = 'rgba(255, 200, 255, 0.02)';
+        ctx.fillRect(0, 0, width, height);
+
+        requestAnimationFrame(drawBackground);
+      }
+      drawBackground();
+
+      // ---------- DOM elements for random content ----------
+      const dynamicSpan = document.getElementById('dynamicWord');
+      const cardTitle1 = document.getElementById('cardTitle1');
+      const cardTitle2 = document.getElementById('cardTitle2');
+      const cardTitle3 = document.getElementById('cardTitle3');
+      const cardDesc1 = document.getElementById('cardDesc1');
+      const cardDesc2 = document.getElementById('cardDesc2');
+      const cardDesc3 = document.getElementById('cardDesc3');
+      const emoji1 = document.getElementById('emoji1');
+      const emoji2 = document.getElementById('emoji2');
+      const emoji3 = document.getElementById('emoji3');
+      const footnote = document.getElementById('footnote');
+      const randomBtn = document.getElementById('randomizeBtn');
+
+      // pools of beautiful randomness
+      const wordPool = [
+        "luminance", "petrichor", "aether", "sonnet", "halcyon",
+        "epiphany", "velvet", "aurora", "solstice", "kaleidoscope",
+        "nirvana", "mellifluous", "ethereal", "cherry blossom", "milky way"
+      ];
+
+      const titlePool = [
+        "cosmic", "dream", "mirage", "lullaby", "stellar", 
+        "mist", "velvet", "arcane", "prism", "reverie", "phosphene"
+      ];
+
+      const descPool = [
+        "stardust & whispers", "floating narratives", "soft echoes",
+        "glimmer haze", "silent waves", "opaline dreams", "lucent shadows",
+        "wandering light", "blooming dusk", "infinite twilight", "secret glow"
+      ];
+
+      const emojiPool = ["✨","🌿","🌀","🌸","🌙","⭐","🍃","🌈","🕊️","🦋","🌊","❄️","🌺","✨","☁️","🌱"];
+
+      const footnotePool = [
+        "« every click is a new beautiful universe »",
+        "„ beauty in randomness — like falling stars “",
+        "— wander into the accidental —",
+        "⋅ ⋅ ⋅  chaos painted with grace  ⋅ ⋅ ⋅",
+        "~~~ where serendipity lives ~~~",
+        "✧ click and let the beauty find you ✧"
+      ];
+
+      function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function randomizeEverything() {
+        // update background theme (colors)
+        updateBackgroundTheme();
+
+        // update main span
+        dynamicSpan.textContent = getRandomItem(wordPool);
+
+        // update three cards (titles, descriptions, emojis)
+        cardTitle1.textContent = getRandomItem(titlePool);
+        cardTitle2.textContent = getRandomItem(titlePool);
+        cardTitle3.textContent = getRandomItem(titlePool);
+
+        cardDesc1.textContent = getRandomItem(descPool);
+        cardDesc2.textContent = getRandomItem(descPool);
+        cardDesc3.textContent = getRandomItem(descPool);
+
+        emoji1.textContent = getRandomItem(emojiPool);
+        emoji2.textContent = getRandomItem(emojiPool);
+        emoji3.textContent = getRandomItem(emojiPool);
+
+        // footnote
+        footnote.textContent = getRandomItem(footnotePool);
+
+        // also add tiny interactive spark: change :hover glow via style? but fine
+        // optional: tweak some particles colors further
+        for (let p of particles) {
+          if (Math.random() > 0.4) {
+            let newH = Math.random() * 360;
+            p.baseColor = `hsl(${newH}, 75%, 70%)`;
+          }
+        }
+      }
+
+      // initial randomisation at load
+      randomizeEverything();
+
+      // button click randomizer
+      randomBtn.addEventListener('click', randomizeEverything);
+
+      // extra hidden fun: also randomize on mousemove occasionally? but keep clean, maybe double click card
+      document.querySelectorAll('.card').forEach((card, idx) => {
+        card.addEventListener('dblclick', (e) => {
+          // subtle: only change that card's details + footnote
+          if (idx === 0) {
+            cardTitle1.textContent = getRandomItem(titlePool);
+            cardDesc1.textContent = getRandomItem(descPool);
+            emoji1.textContent = getRandomItem(emojiPool);
+          } else if (idx === 1) {
+            cardTitle2.textContent = getRandomItem(titlePool);
+            cardDesc2.textContent = getRandomItem(descPool);
+            emoji2.textContent = getRandomItem(emojiPool);
+          } else {
+            cardTitle3.textContent = getRandomItem(titlePool);
+            cardDesc3.textContent = getRandomItem(descPool);
+            emoji3.textContent = getRandomItem(emojiPool);
+          }
+          footnote.textContent = getRandomItem(footnotePool);
+          e.stopPropagation();
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>
